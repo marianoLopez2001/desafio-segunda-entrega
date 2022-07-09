@@ -1,56 +1,68 @@
 const Catalogo = [
-    { id: 1, nombre: "remera", img: "./images/remera.jpg", cantidad: 1, descripcion: "jorgelin22", precio: 200},
-    { id: 2, nombre: "pantalon", img: "./images/pantalon.webp", cantidad: 1, descripcion: "jorgelin23", precio: 200},
-    { id: 3, nombre: "buzo", img: "./images/buzo.webp", cantidad: 1, descripcion: "jorgelin24", precio: 200}
+    { id: 1, nombre: "remera", img: "./images/remera.jpg", cantidad: 1, descripcion: "una remera...", precio: 200, stock: true },
+    { id: 2, nombre: "pantalon", img: "./images/pantalon.webp", cantidad: 1, descripcion: "un pantalon...", precio: 200, stock: true },
+    { id: 3, nombre: "buzo", img: "./images/buzo.webp", cantidad: 1, descripcion: "un buzo...", precio: 200, stock: false }
 ];
 
 const Carrito = [];
 
-for (const producto of Catalogo) {
-    let cardContainer = document.getElementById(`card-container`)
-    cardContainer.innerHTML += `
-    <div class="card" style="width: 18rem;">
-    <img src=${producto.img} class="card-img" alt="...">
-    <div class="card-body">
-      <h2 class="card-title">${producto.nombre}</h2>
-      <p class="card-desc">${producto.descripcion}</p>
-      <p class="card-precio">${producto.precio}</p>
-      <p>${producto.id}</p>
-      <button id="botonAgregarCarrito" class="btn btn-primary" onClick="clickAgregarCarrito(${producto.id})">Agregar al carrito</button>
-    </div>
-  </div>
-    `
-}
+//CREADOR DE CARDS IF STOCK=TRUE
 
-const agregarCarrito = () => {
-console.log("click");
-}
-
-// const botonAgregarCarrito = document.querySelectorAll("#botonAgregarCarrito")
-// botonAgregarCarrito.forEach((e)=>{
-//     e.addEventListener("click", clickAgregarCarrito)
-// })
-
-function clickAgregarCarrito(id) {
-    let producto = Catalogo.find(producto => producto.id === id);
-
-    let productoEnCarrito = Carrito.find(productoEnCarrito => productoEnCarrito.id === id);
-
-    if (productoEnCarrito) {
-        productoEnCarrito.cantidad++;
-        console.log(Carrito);
-    } else {
-        producto.cantidad = 1;
-        Carrito.push(producto);
-        console.log(Carrito);
+for (const iterador of Catalogo) {
+    if (iterador.stock) {
+        const cardContainer = document.querySelector("#card-container")
+        const cardHTML = `
+        <div class="card-container">
+            <img src=${iterador.img} alt="">
+            <div class="inner-card-container">
+              <p>${iterador.nombre}</p>
+              <p>${iterador.descripcion}</p>
+            </div>
+            <p>${iterador.precio}</p>
+            <button class="btn-agregarCarrito" onClick="agregarAlCarrito(${iterador.id})">Agregar al carrito</button>
+        </div>
+        `
+        cardContainer.innerHTML += cardHTML
     }
 }
 
-// function clickAgregarCarrito(event) {
-//     const boton = event.target;
-//     const item = boton.closest(".card")
-//     const itemTitle = item.querySelector(".card-title").textContent;
-//     const itemImg = item.querySelector(".card-img").src;
-//     const itemDesc = item.querySelector(".card-desc").textContent;
-//     const itemPrice = item.querySelector(".card-precio").textContent;
-// }
+//Funcion agregar al carrito
+function agregarAlCarrito(id) {
+    
+    let buscarProductoEnCatalogo = Catalogo.find(buscarId => buscarId.id ===id)
+    
+    let buscarProductoEnCarrito = Carrito.find(buscarId => buscarId.id ===id)
+
+    if (buscarProductoEnCarrito) {
+        buscarProductoEnCarrito.cantidad++
+        console.log(Carrito);
+        actualizarCarritoHTML()
+    } else {
+        buscarProductoEnCatalogo.cantidad = 1;
+        Carrito.push(buscarProductoEnCatalogo);
+        console.log(Carrito);
+        actualizarCarritoHTML()
+    }
+}
+
+//CREADOR DE CARRITO EN HTML
+function actualizarCarritoHTML() {
+    
+    let carritoHTML = ""
+    const carritoHTMLContainer = document.querySelector(".carrito-dropdown-container");
+
+for (const iterador of Carrito) {
+        carritoHTML += `
+        <div class="card-container">
+            <img src=${iterador.img} alt="">
+            <div class="inner-card-container">
+              <p>${iterador.nombre}</p>
+              <p>${iterador.descripcion}</p>
+            </div>
+            <p>${iterador.precio}</p>
+            <p>${iterador.cantidad}</p>
+        </div>
+        `;
+        carritoHTMLContainer.innerHTML = carritoHTML
+    }
+}
