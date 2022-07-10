@@ -29,6 +29,8 @@ for (const iterador of Catalogo) {
 //Funcion agregar al carrito
 function agregarAlCarrito(id) {
     
+    //FIND NO ES BOOLEANO, LO QUE HACE ES ENCONTRAR UN OBJETO MEDIANTE LA CONDICION
+
     let buscarProductoEnCatalogo = Catalogo.find(buscarId => buscarId.id ===id)
     
     let buscarProductoEnCarrito = Carrito.find(buscarId => buscarId.id ===id)
@@ -43,15 +45,18 @@ function agregarAlCarrito(id) {
         console.log(Carrito);
         actualizarCarritoHTML()
     }
+    operacionTotal()
 }
+
+let carritoHTMLContainer
 
 //CREADOR DE CARRITO EN HTML
 function actualizarCarritoHTML() {
     
     let carritoHTML = ""
-    const carritoHTMLContainer = document.querySelector(".carrito-dropdown-container");
+    carritoHTMLContainer = document.querySelector(".carrito-dropdown-container");
 
-for (const iterador of Carrito) {
+    Carrito.forEach((iterador, id) => {
         carritoHTML += `
         <div class="card-container">
             <img src=${iterador.img} alt="">
@@ -61,8 +66,39 @@ for (const iterador of Carrito) {
             </div>
             <p>${iterador.precio}</p>
             <p>${iterador.cantidad}</p>
+            <button class="botonEliminarCarrito" onClick="eliminarDelCarrito(${id})">Eliminar</button>
         </div>
         `;
-        carritoHTMLContainer.innerHTML = carritoHTML
+    })
+
+    carritoHTMLContainer.innerHTML = carritoHTML
+}
+
+//FUNCION ELIMINAR DEL CARRITO
+
+    let botonEliminarCarrito = document.querySelector(".botonEliminarCarrito")
+
+function eliminarDelCarrito(id) {
+    
+    Carrito[id].cantidad --;
+
+    if (Carrito[id].cantidad === 0) {
+        operacionTotal()
+        Carrito.splice(id, 1)
     }
+    else {
+        operacionTotal()
+    }
+    actualizarCarritoHTML()
+};
+
+function operacionTotal() {
+    
+    let costoTotal = 0
+
+    Carrito.forEach((p) => {
+        costoTotal += p.precio * p.cantidad;
+    })
+
+    console.log(costoTotal);
 }
