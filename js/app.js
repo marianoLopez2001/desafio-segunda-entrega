@@ -25,6 +25,8 @@ const Carrito = [];
 
 let cardContainer
 
+const precioDom = document.querySelector("#dom-precio")
+
 for (const iterador of Catalogo) {
     if (iterador.stock) {
         cardContainer = document.querySelector("#card-container")
@@ -60,36 +62,28 @@ function agregarAlCarrito(id) {
 
     operacionTotal()
 
-    objetoStorageSet()
-}
-
-//______________________________________---
-
-function objetoStorageSet() {
     localStorage.setItem("Carrito", JSON.stringify(Carrito))
 }
 
-//_________________________________
-
 let objetoStorageGet = JSON.parse(localStorage.getItem("Carrito"))
 
-document.addEventListener("DOMContentLoaded", sevieneee())
+//FUNCION PARA QUE AL INICIO DE LA PAGINA ME RENDERIZE EL CONTENIDO DEL STORAGE AL CARRITO
 
-function sevieneee() {
+document.addEventListener("DOMContentLoaded", pushStorageACarrito())
+
+function pushStorageACarrito() {
     if (objetoStorageGet) {
         objetoStorageGet.forEach(i => {
             Carrito.push(i)
         });
-    } else {
-        console.log("no hay nada en el storage");
     }
-    console.log(Carrito);
 }
 
+//FUNCION PARA RENDERIZAR MIS PRODUCTOS DEL CARRITO AL DOM
 
 let carritoHTMLContainer
 
-//CREADOR DE CARRITO EN HTML
+//RENDERIZA EL CARRITO EN HTML
 function actualizarCarritoHTML() {
 
     let carritoHTML = ""
@@ -113,6 +107,9 @@ function actualizarCarritoHTML() {
     carritoHTMLContainer.innerHTML = carritoHTML
 }
 
+document.addEventListener("DOMContentLoaded", actualizarCarritoHTML)
+
+
 //FUNCION ELIMINAR DEL CARRITO
 
 let botonEliminarCarrito = document.querySelector(".botonEliminarCarrito")
@@ -128,10 +125,14 @@ function eliminarDelCarrito(id) {
     else {
         operacionTotal()
     }
+
+    localStorage.setItem("Carrito", JSON.stringify(Carrito))
+
     actualizarCarritoHTML()
+
 };
 
-//FUNCION QUE CALCULA EL TOTAL DE LA COMPRA Y LO MUESTRA EN EL DOM
+//FUNCION QUE CALCULA EL TOTAL DE LA COMPRA Y LO MUESTRA EN EL DOM MEDIANTE UNA VALIDACION
 function operacionTotal() {
 
     let costoTotal = 0
@@ -140,9 +141,19 @@ function operacionTotal() {
         costoTotal += p.precio * p.cantidad;
     })
 
-    const precioDom = document.querySelector("#dom-precio")
+    JSON.stringify(localStorage.setItem("Total", costoTotal))
+    let costoTotalStorage = JSON.parse(localStorage.getItem("Total"))
 
-    precioDom.innerHTML = `Costo total: ${costoTotal}`
+    precioDom.innerHTML = `Costo total: ${costoTotalStorage}`
+}
+
+document.addEventListener("DOMContentLoaded", validacionParaObtenerElTotalEnDom)
+
+function validacionParaObtenerElTotalEnDom() {
+    if (JSON.parse(localStorage.getItem("Total"))) {
+        precioDom.innerHTML = `Costo total: ${JSON.parse(localStorage.getItem("Total"))}`
+        console.log("si hay");
+    }
 }
 
 //OPCION DE FILTRADO POR CATEGORIA MARCA
@@ -184,7 +195,6 @@ function filtrarPorCategoria() {
                 `
             }
         }
-
     }
 }
 
