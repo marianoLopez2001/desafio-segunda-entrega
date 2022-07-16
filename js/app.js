@@ -28,9 +28,8 @@ let cardContainer
 const precioDom = document.querySelector("#dom-precio")
 
 for (const iterador of Catalogo) {
-    if (iterador.stock) {
-        cardContainer = document.querySelector("#card-container")
-        const cardHTML = `
+    cardContainer = document.querySelector("#card-container");
+    const cardHTML = `
         <div class="card-container">
             <img src=${iterador.img} alt="">
               <p>${iterador.nombre}</p>
@@ -39,8 +38,7 @@ for (const iterador of Catalogo) {
               <button class="btn btn-primary" onClick="agregarAlCarrito(${iterador.id})">Agregar al carrito</button>
         </div>
         `
-        cardContainer.innerHTML += cardHTML
-    }
+    iterador.stock && (cardContainer.innerHTML += cardHTML)
 }
 
 //FUNCION AGREGAR AL CARRITO SI LA CONDICION "STOCK" SE CUMPLE
@@ -51,14 +49,23 @@ function agregarAlCarrito(id) {
 
     let buscarProductoEnCarrito = Carrito.find(buscarId => buscarId.id === id)
 
-    if (buscarProductoEnCarrito) {
-        buscarProductoEnCarrito.cantidad++
+    buscarProductoEnCarrito ? (
+        buscarProductoEnCarrito.cantidad++,
         actualizarCarritoHTML()
-    } else {
-        buscarProductoEnCatalogo.cantidad = 1;
-        Carrito.push(buscarProductoEnCatalogo);
-        actualizarCarritoHTML()
-    }
+    ) : (
+        buscarProductoEnCatalogo.cantidad = 1,
+        Carrito.push(buscarProductoEnCatalogo), actualizarCarritoHTML()
+    );
+
+    Toastify({
+        text: "Producto agregado",
+        duration: 1500,
+        gravity: "top", // `top` or `bottom`
+        position: "right", // `left`, `center` or `right`
+        style: {
+            background: "linear-gradient(to right, #3eec00, #86ff5b)",
+        }
+    }).showToast();
 
     operacionTotal()
 
@@ -72,11 +79,9 @@ let objetoStorageGet = JSON.parse(localStorage.getItem("Carrito"))
 document.addEventListener("DOMContentLoaded", pushStorageACarrito())
 
 function pushStorageACarrito() {
-    if (objetoStorageGet) {
-        objetoStorageGet.forEach(i => {
-            Carrito.push(i)
-        });
-    }
+    objetoStorageGet && objetoStorageGet.forEach(i => {
+        Carrito.push(i)
+    });
 }
 
 //FUNCION PARA RENDERIZAR MIS PRODUCTOS DEL CARRITO AL DOM
@@ -118,13 +123,22 @@ function eliminarDelCarrito(id) {
 
     Carrito[id].cantidad--;
 
-    if (Carrito[id].cantidad === 0) {
-        operacionTotal()
+    Carrito[id].cantidad === 0 ? (
+        operacionTotal(),
         Carrito.splice(id, 1)
-    }
-    else {
+    ) : (
         operacionTotal()
-    }
+    );
+
+    Toastify({
+        text: "Producto eliminado",
+        duration: 1500,
+        gravity: "top", // `top` or `bottom`
+        position: "right", // `left`, `center` or `right`
+        style: {
+            background: "linear-gradient(to right, #ff0000, #ff5b5b)",
+        }
+    }).showToast();
 
     localStorage.setItem("Carrito", JSON.stringify(Carrito))
 
@@ -150,10 +164,7 @@ function operacionTotal() {
 document.addEventListener("DOMContentLoaded", validacionParaObtenerElTotalEnDom)
 
 function validacionParaObtenerElTotalEnDom() {
-    if (JSON.parse(localStorage.getItem("Total"))) {
-        precioDom.innerHTML = `Costo total: ${JSON.parse(localStorage.getItem("Total"))}`
-        console.log("si hay");
-    }
+    JSON.parse(localStorage.getItem("Total")) && (precioDom.innerHTML = `Costo total: ${JSON.parse(localStorage.getItem("Total"))}`)
 }
 
 //OPCION DE FILTRADO POR CATEGORIA MARCA
@@ -166,25 +177,8 @@ function filtrarPorCategoria() {
     cardContainer.innerHTML = ""
 
     for (const iterador of Filtrado) {
-        if (iterador.stock === true) {
-
+        iterador.stock === true && (
             cardContainer.innerHTML += `
-            <div class="card-container">
-                <img src=${iterador.img} alt="">
-                  <p>${iterador.nombre}</p>
-                  <p>${iterador.descripcion}</p>
-                  <p>Precio: ${iterador.precio}</p>
-                  <button class="btn btn-primary" onClick="agregarAlCarrito(${iterador.id})">Agregar al carrito</button>
-            </div>
-            `
-        }
-    }
-
-    if (llamadoSelectFilter === "No filtrar") {
-        for (const iterador of Catalogo) {
-            if (iterador.stock === true) {
-
-                cardContainer.innerHTML += `
                 <div class="card-container">
                     <img src=${iterador.img} alt="">
                       <p>${iterador.nombre}</p>
@@ -193,10 +187,23 @@ function filtrarPorCategoria() {
                       <button class="btn btn-primary" onClick="agregarAlCarrito(${iterador.id})">Agregar al carrito</button>
                 </div>
                 `
-            }
+        )
+    }
+
+    if (llamadoSelectFilter === "No filtrar") {
+        for (const iterador of Catalogo) {
+            iterador.stock === true && (
+                cardContainer.innerHTML += `
+                <div class="card-container">
+                    <img src=${iterador.img} alt="">
+                      <p>${iterador.nombre}</p>
+                      <p>${iterador.descripcion}</p>
+                      <p>Precio: ${iterador.precio}</p>
+                      <button class="btn btn-primary" onClick="agregarAlCarrito(${iterador.id})">Agregar al carrito</button>
+                </div>
+                `)
+
         }
     }
 }
-
-
 
